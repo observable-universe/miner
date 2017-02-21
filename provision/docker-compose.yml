@@ -1,0 +1,10 @@
+services:
+  miner:
+    build: .
+    image: php:7.1-apache
+    volumes:
+      - ../:/srv/miner
+    ports:
+      - 80:80
+      - 443:443
+version: "2"
