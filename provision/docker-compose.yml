@@ -1,7 +1,7 @@
 services:
   miner:
     build: .
-    image: php:7.1-apache
+    image: php:7.1-fpm
     volumes:
       - ../:/srv/miner
     ports:
