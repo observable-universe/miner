@@ -1,8 +1,7 @@
 <?php namespace Miner\Auth\Repositories;
 
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Support\Facades\Auth;
 use Miner\Auth\Entities\AuthenticatedUser;
+use Miner\Auth\Entities\User;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserRepository
@@ -12,9 +11,9 @@ class UserRepository
         $this->db = app('db');
     }
 
-    public function findAuthenticatedUserByUsernameAndPassword($username, $password)
+    public function findByEmail($email): User
     {
-        $result = $this->db->select('SELECT id, role, password_hash FROM users WHERE username = ?', [$username]);
+        $result = $this->db->select('SELECT id, password_hash, role FROM users WHERE email = ?', [$email]);
 
         if(!is_array($result) || count($result) === 0) {
             throw new NotFoundHttpException();
@@ -24,25 +23,24 @@ class UserRepository
             throw new \Exception('more than one user matched');
         }
 
-        $user = $result[0];
-
-        if($user->password_hash !== $password) {
-            throw new AuthenticationException('invalid password');
-        }
-
-        return new AuthenticatedUser($user->id, $user->role);
+        return $this->createUserFromResult($result);
     }
 
-    public function findAuthenticatedUser($id)
+    public function findById($id): User
     {
-        $result = $this->db->select('SELECT id, role FROM users WHERE id = ?', [$id]);
+        $result = $this->db->select('SELECT id, password_hash, role FROM users WHERE id = ?', [$id]);
 
         if(!is_array($result) || count($result) === 0) {
             throw new NotFoundHttpException();
         }
 
+        return $this->createUserFromResult($result);
+    }
+
+    private function createUserFromResult($result): User
+    {
         $user = $result[0];
 
-        return new AuthenticatedUser($user->id, $user->role);
+        return new User($user->id, $user->password_hash, $user->role);
     }
 }
