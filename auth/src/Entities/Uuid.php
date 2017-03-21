@@ -7,12 +7,18 @@ class Uuid
         $this->uuid = $this->generateUuid();
     }
 
-    public function toString()
+    /**
+     * @return string
+     */
+    public function toString(): string
     {
         return $this->uuid;
     }
 
-    private function generateUuid()
+    /**
+     * @return string
+     */
+    private function generateUuid(): string
     {
         return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),

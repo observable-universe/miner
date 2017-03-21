@@ -1,6 +1,5 @@
 <?php namespace Miner\Auth\Repositories;
 
-use Miner\Auth\Entities\AuthenticatedUser;
 use Miner\Auth\Entities\User;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -11,7 +10,13 @@ class UserRepository
         $this->db = app('db');
     }
 
-    public function findByEmail($email): User
+    /**
+     * @param string $email
+     * @return User
+     *
+     * @throws \Exception
+     */
+    public function findByEmail(string $email): User
     {
         $result = $this->db->select('SELECT id, password_hash, role FROM users WHERE email = ?', [$email]);
 
@@ -26,7 +31,12 @@ class UserRepository
         return $this->createUserFromResult($result);
     }
 
-    public function findById($id): User
+    /**
+     * @param int $id
+     *
+     * @return User
+     */
+    public function findById(int $id): User
     {
         $result = $this->db->select('SELECT id, password_hash, role FROM users WHERE id = ?', [$id]);
 
@@ -37,7 +47,12 @@ class UserRepository
         return $this->createUserFromResult($result);
     }
 
-    private function createUserFromResult($result): User
+    /**
+     * @param array $result
+     *
+     * @return User
+     */
+    private function createUserFromResult(array $result): User
     {
         $user = $result[0];
 

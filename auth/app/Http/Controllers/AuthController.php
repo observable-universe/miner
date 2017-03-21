@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
@@ -14,7 +14,7 @@ use Miner\Auth\Entities\Uuid;
 
 class AuthController extends BaseController
 {
-    public function login(Request $request, UserRepository $userRepository, Repository $cache)
+    public function login(Request $request, UserRepository $userRepository, Cache $cache)
     {
         $this->validate($request, [
             'username' => 'required',
@@ -51,7 +51,7 @@ class AuthController extends BaseController
         return response()->json(['accessToken' => $accessToken, 'refreshToken' => $uuid->toString()]);
     }
 
-    public function refresh(Request $request, UserRepository $userRepository, Repository $cache)
+    public function refresh(Request $request, UserRepository $userRepository, Cache $cache)
     {
         $this->validate($request, [
             'accessToken' => 'required',
@@ -79,11 +79,6 @@ class AuthController extends BaseController
         $accessToken = (string)$this->generateAccessToken($user);
 
         return response()->json(['accessToken' => $accessToken]);
-    }
-
-    private function getCacheKey($id)
-    {
-        return "user-$id";
     }
 
     private function generateAccessToken(User $user)
