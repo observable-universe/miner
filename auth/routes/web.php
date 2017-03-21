@@ -11,5 +11,5 @@
 |
 */
 
-$app->post('/', 'AuthController@login');
+$app->post('/login', 'AuthController@login');
 $app->post('/refresh', 'AuthController@refresh');

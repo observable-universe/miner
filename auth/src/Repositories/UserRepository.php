@@ -32,22 +32,6 @@ class UserRepository
     }
 
     /**
-     * @param int $id
-     *
-     * @return User
-     */
-    public function findById(int $id): User
-    {
-        $result = $this->db->select('SELECT id, password_hash, role FROM users WHERE id = ?', [$id]);
-
-        if(!is_array($result) || count($result) === 0) {
-            throw new NotFoundHttpException();
-        }
-
-        return $this->createUserFromResult($result);
-    }
-
-    /**
      * @param array $result
      *
      * @return User
