@@ -1,13 +1,14 @@
 <?php namespace Miner\Auth\Repositories;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\DatabaseManager;
 use Miner\Auth\Entities\User;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserRepository
 {
-    public function __construct()
+    public function __construct(DatabaseManager $db)
     {
-        $this->db = app('db');
+        $this->db = $db;
     }
 
     /**
@@ -20,24 +21,14 @@ class UserRepository
     {
         $result = $this->db->select('SELECT id, password_hash, role FROM users WHERE email = ?', [$email]);
 
-        if(!is_array($result) || count($result) === 0) {
-            throw new NotFoundHttpException();
+        if(!is_array($result) || !count($result)) {
+            throw new AuthenticationException("user not found ($email)");
         }
 
         if(count($result) > 1) {
-            throw new \Exception('more than one user matched');
+            throw new \Exception("more than one user matched ($email)");
         }
 
-        return $this->createUserFromResult($result);
-    }
-
-    /**
-     * @param array $result
-     *
-     * @return User
-     */
-    private function createUserFromResult(array $result): User
-    {
         $user = $result[0];
 
         return new User($user->id, $user->password_hash, $user->role);
