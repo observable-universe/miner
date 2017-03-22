@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
-use Miner\Auth\Entities\User;
 use Miner\Auth\Jwt\JwtFactory;
 use Miner\Auth\RefreshTokens\RefreshTokenManager;
 use Miner\Auth\Repositories\UserRepository;
 
 class AuthController extends BaseController
 {
+    const LOGIN_VALIDATORS = ['email' => 'required', 'password' => 'required'];
+
+    const REFRESH_VALIDATORS = ['email' => 'required', 'refreshToken' => 'required'];
+
     /**
      * @param Request $request
      * @param UserRepository $userRepository
@@ -19,7 +23,7 @@ class AuthController extends BaseController
      * @param RefreshTokenManager $refreshTokenManager
      *
      * @return JsonResponse
-     * @throws \Exception
+     * @throws AuthenticationException
      */
     public function login(
         Request $request,
@@ -28,11 +32,13 @@ class AuthController extends BaseController
         RefreshTokenManager $refreshTokenManager
     ): JsonResponse
     {
-        $user = $this->getUser($request, $userRepository);
+        $this->validate($request, self::LOGIN_VALIDATORS);
+
+        $user = $userRepository->findByEmail($request->get('email'));
 
         // use php 5.5+ password_hash/password_verify magix to validate the password matches
         if(!password_verify($request->get('password'), $user->getPasswordHash())) {
-            throw new \Exception('invalid password');
+            throw new AuthenticationException('invalid password');
         }
 
         $accessToken = $jwtFactory->generateForUser($user);
@@ -45,32 +51,19 @@ class AuthController extends BaseController
     /**
      * @param Request $request
      * @param UserRepository $userRepository
-     * @param RefreshTokenManager $refreshTokenManager
      *
      * @return JsonResponse
      */
-    public function refresh(Request $request, UserRepository $userRepository, RefreshTokenManager $refreshTokenManager)
+    public function refresh(Request $request, UserRepository $userRepository, JwtFactory $jwtFactory, RefreshTokenManager $refreshTokenManager)
     {
-        $user = $this->getUser($request, $userRepository);
+        $this->validate($request, self::REFRESH_VALIDATORS);
 
-        $accessToken = $refreshTokenManager->addForUser($user);
+        $user = $userRepository->findByEmail($request->get('email'));
+
+        $refreshTokenManager->validateRefreshToken($request->get('refreshToken'), $user);
+
+        $accessToken = $jwtFactory->generateForUser($user);
 
         return response()->json(['accessToken' => $accessToken]);
-    }
-
-    /**
-     * @param Request $request
-     * @param UserRepository $userRepository
-     *
-     * @return User
-     */
-    private function getUser(Request $request, UserRepository $userRepository): User
-    {
-        $this->validate($request, [
-            'email' => 'required',
-            'password' => 'required'
-        ]);
-
-        return $userRepository->findByEmail($request->get('email'));
     }
 }
