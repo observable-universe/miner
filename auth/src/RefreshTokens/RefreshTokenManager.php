@@ -28,7 +28,7 @@ class RefreshTokenManager
      *
      * @throws AuthenticationException
      */
-    public function validateRefreshToken(string $refreshToken, User $user)
+    public function validateRefreshToken(string $refreshToken, User $user): bool
     {
         $activeRefreshTokens = json_decode($this->cache->get($user->getCacheKey()));
 

@@ -41,11 +41,11 @@ class AuthController extends BaseController
             throw new AuthenticationException('invalid password');
         }
 
-        $accessToken = $jwtFactory->generateForUser($user);
+        $accessTokenString = (string)$jwtFactory->generateForUser($user);
 
         $refreshToken = $refreshTokenManager->addForUser($user);
 
-        return response()->json(['accessToken' => $accessToken, 'refreshToken' => $refreshToken]);
+        return response()->json(['accessToken' => $accessTokenString, 'refreshToken' => $refreshToken]);
     }
 
     /**
@@ -62,8 +62,8 @@ class AuthController extends BaseController
 
         $refreshTokenManager->validateRefreshToken($request->get('refreshToken'), $user);
 
-        $accessToken = $jwtFactory->generateForUser($user);
+        $accessTokenString = (string)$jwtFactory->generateForUser($user);
 
-        return response()->json(['accessToken' => $accessToken]);
+        return response()->json(['accessToken' => $accessTokenString]);
     }
 }

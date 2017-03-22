@@ -2,6 +2,7 @@
 
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Token;
 use Miner\Auth\Entities\User;
 
 class JwtFactory
@@ -22,9 +23,9 @@ class JwtFactory
     /**
      * @param User $user
      *
-     * @return string
+     * @return Token
      */
-    public function generateForUser(User $user): string
+    public function generateForUser(User $user): Token
     {
         $builder = new Builder();
 
