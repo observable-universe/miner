@@ -8,9 +8,7 @@
         "php": ">=5.6.4",
         "laravel/lumen-framework": "5.4.*",
         "vlucas/phpdotenv": "~2.2",
-        "tymon/jwt-auth": "0.5.*",
         "lcobucci/jwt": "3.2.*",
-        "ramsey/uuid": "^3.5",
         "predis/predis": "^1.1",
         "illuminate/redis": "^5.4"
     },
@@ -27,8 +25,7 @@
     },
     "autoload-dev": {
         "classmap": [
-            "tests/",
-            "database/"
+            "tests/"
         ]
     },
     "scripts": {
