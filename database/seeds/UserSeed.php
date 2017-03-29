@@ -18,6 +18,5 @@ class UserSeed extends AbstractSeed
         ]);
 
         $users->save();
-
     }
 }
